@@ -5,9 +5,8 @@
   let cash = 1000;
   let savings = 0;
   let workLeft = initialWorkLeft;
-  let numberProperty = 0;
 
-  const salaryPerMonth = 1200;
+  const salaryPerMonth = 1500;
   const salaryPerDay = salaryPerMonth/20;
 
   const transferAmountSmall = 200;
@@ -16,9 +15,9 @@
   const annualExpenses = 700;
   const interestRate = 0.07;
 
-  let hasProperty = false;
   const propertyCost = 20000;
   const propertyIncome = 1500;
+  let propertyNumber = 0;
 
   let message = "";
 
@@ -44,9 +43,8 @@
 
   function buyProperty() {
     if (savings >= propertyCost) {
-      numberProperty += 1;
+      propertyNumber += 1;
       savings -= propertyCost;
-      hasProperty = true;
       message = "Propriété achetée ! Tu recevras 1500 € chaque année.";
     } else {
       message = "Impossible d’acheter la propriété.";
@@ -60,9 +58,7 @@
     
 
     // Revenu passif
-    if (hasProperty) {
-      cash += propertyIncome * numberProperty;
-    }
+    cash = cash + (propertyIncome * propertyNumber);
 
     // Intérêts
     let interest = 0;
@@ -86,9 +82,14 @@
     }
 
     workLeft = initialWorkLeft;
+    
+    message = `Nouveau mois. Dépenses : ${annualExpenses} €, intérêts : ${interest.toFixed(2)} €`;
+    if (propertyNumber > 0) {
+      message += `. Revenu locatif : ${propertyIncome * propertyNumber} €`;
+    }
+    
+    message += '.';
 
-    message = `Nouveau mois. Dépenses : ${annualExpenses} €, intérêts : ${interest.toFixed(2)} €.` + 
-      (hasProperty ? ` + revenu locatif : ${propertyIncome} €.` : "");
   }
 </script>
 
@@ -99,7 +100,7 @@
 <p>🏦 Compte épargne : {savings.toFixed(2)} €</p>
 <p>🧾 Dépenses annuelles : {annualExpenses} €</p>
 <p>🛠️ Travail restant : {workLeft} / {initialWorkLeft}</p>
-<p>🏠 Propriété : {hasProperty ? 'Oui ✅' : 'Non ❌'}</p>
+<p>🏠 Propriété : {propertyNumber > 0 ? 'Oui ✅' : 'Non ❌'}</p>
 
 <div>
   <button on:click={work} disabled={workLeft === 0}>👷 Travailler (+ {salaryPerDay} €)</button>
