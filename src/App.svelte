@@ -5,6 +5,7 @@
   let cash = 1000;
   let savings = 0;
   let workLeft = initialWorkLeft;
+  let numberProperty = 0;
 
   const salaryPerMonth = 1200;
   const salaryPerDay = salaryPerMonth/20;
@@ -42,7 +43,8 @@
   }
 
   function buyProperty() {
-    if (!hasProperty && savings >= propertyCost) {
+    if (savings >= propertyCost) {
+      numberProperty += 1;
       savings -= propertyCost;
       hasProperty = true;
       message = "Propriété achetée ! Tu recevras 1500 € chaque année.";
@@ -59,18 +61,28 @@
 
     // Revenu passif
     if (hasProperty) {
-      cash += propertyIncome;
+      cash += propertyIncome * numberProperty;
     }
 
     // Intérêts
-    const interest = savings * interestRate;
-    cash += interest;
+    let interest = 0;
+    if (month%12 == 0) {
+      interest = savings * interestRate;
+      cash += interest;
+    }
 
     cash -= annualExpenses;
 
     if (cash < 0) {
-      message = "💀 Tu es ruiné !";
-      return;
+      const difference = 0 - cash;
+      savings -= difference; // déduire le loyer dans l'épargne
+      cash += difference; // remise à zéro
+
+      if (savings - difference < 0) {
+        message = "💀 Tu es ruiné !";
+        return;
+      }
+      
     }
 
     workLeft = initialWorkLeft;
@@ -92,7 +104,7 @@
 <div>
   <button on:click={work} disabled={workLeft === 0}>👷 Travailler (+ {salaryPerDay} €)</button>
   <button on:click={() => transfer(transferAmountSmall)}>📥 Transférer vers l’épargne ( { transferAmountSmall } €)</button>
-  <button on:click={buyProperty} disabled={hasProperty || savings < propertyCost}>🏠 Acheter propriété (20 000 €)</button>
+  <button on:click={buyProperty} disabled={savings < propertyCost}>🏠 Acheter propriété (20 000 €)</button>
   <button on:click={nextYear}>⏭️ Nouveau mois </button>
 </div>
 <div>
