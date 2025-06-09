@@ -1,31 +1,62 @@
 <script>
-  const initialWorkLeft = 31;
+  let isJobChoosen = false;
+
+  const availableProperties = [
+    { name: "Studio à Lyon", price: 30000, rent: 300 },
+    { name: "T2 à Marseille", price: 50000, rent: 600 },
+    { name: "Immeuble en province", price: 100000, rent: 1400 }
+  ];
+  let ownedProperties = [];
+
+  const initialWorkLeft = 10;
 
   let month = 1;
   let cash = 1000;
   let savings = 0;
   let workLeft = initialWorkLeft;
 
-  const salaryPerMonth = 1500;
-  const salaryPerDay = salaryPerMonth/20;
+  let salaryPerWork = 0;
 
-  const transferAmountSmall = 200;
-  const transferAmountMedium = 2000;
-
+  const transferAmountSmall = 500;
   const annualExpenses = 700;
   const interestRate = 0.07;
+  const workingDivider = 6;
 
-  const propertyCost = 20000;
-  const propertyIncome = 1500;
-  let propertyNumber = 0;
 
   let message = "";
 
+  function chooseJob(jobName) {
+    switch (jobName) {
+      case "Caissier":
+        salaryPerWork = 1200/workingDivider;
+        isJobChoosen = true;
+        break;
+
+      case "Commercial":
+        salaryPerWork = 2100/workingDivider;
+        isJobChoosen = true;
+        break;
+
+      case "Expert_Financier":
+        salaryPerWork = 3500/workingDivider;
+        isJobChoosen = true;
+        break;
+
+      case "Jeff_Bezos":
+        salaryPerWork = 900000/workingDivider;
+        isJobChoosen = true;
+        break;
+    
+      default:
+        break;
+    }
+  }
+
   function work() {
     if (workLeft > 0) {
-      cash += salaryPerDay;
+      cash += salaryPerWork;
       workLeft--;
-      message = `Tu as travaillé et gagné ${salaryPerDay} €.`;
+      message = `Tu as travaillé et gagné ${salaryPerWork} €.`;
     } else {
       message = "Tu ne peux plus travailler cette année.";
     }
@@ -41,13 +72,12 @@
     }
   }
 
-  function buyProperty() {
-    if (savings >= propertyCost) {
-      propertyNumber += 1;
-      savings -= propertyCost;
-      message = "Propriété achetée ! Tu recevras 1500 € chaque année.";
+  function buy(property) {
+    if (savings >= property.price) {
+      savings -= property.price;
+      ownedProperties = [...ownedProperties, property];
     } else {
-      message = "Impossible d’acheter la propriété.";
+      alert("Pas assez d'argent !");
     }
   }
 
@@ -58,7 +88,9 @@
     
 
     // Revenu passif
-    cash = cash + (propertyIncome * propertyNumber);
+    let totalRent = ownedProperties.reduce((sum, p) => sum + p.rent, 0);
+    cash += totalRent;
+
 
     // Intérêts
     let interest = 0;
@@ -84,8 +116,8 @@
     workLeft = initialWorkLeft;
     
     message = `Nouveau mois. Dépenses : ${annualExpenses} €, intérêts : ${interest.toFixed(2)} €`;
-    if (propertyNumber > 0) {
-      message += `. Revenu locatif : ${propertyIncome * propertyNumber} €`;
+    if (totalRent > 0) {
+      message += `. Revenu locatif : ${totalRent} €`;
     }
     
     message += '.';
@@ -93,24 +125,49 @@
   }
 </script>
 
-<h1>💰 Jeu éducatif : Intérêts Composés</h1>
-
-<p>Mois : {month}</p>
-<p>💵 Compte courant : {cash.toFixed(2)} €</p>
-<p>🏦 Compte épargne : {savings.toFixed(2)} €</p>
-<p>🧾 Dépenses annuelles : {annualExpenses} €</p>
-<p>🛠️ Travail restant : {workLeft} / {initialWorkLeft}</p>
-<p>🏠 Propriété : {propertyNumber > 0 ? 'Oui ✅' : 'Non ❌'}</p>
-
-<div>
-  <button on:click={work} disabled={workLeft === 0}>👷 Travailler (+ {salaryPerDay} €)</button>
-  <button on:click={() => transfer(transferAmountSmall)}>📥 Transférer vers l’épargne ( { transferAmountSmall } €)</button>
-  <button on:click={buyProperty} disabled={savings < propertyCost}>🏠 Acheter propriété (20 000 €)</button>
-  <button on:click={nextYear}>⏭️ Nouveau mois </button>
-</div>
-<div>
-  <button on:click={() => transfer(transferAmountMedium)}>📥 Transférer vers l’épargne ( { transferAmountMedium } €)</button>
-</div>
+{#if !isJobChoosen}
+  <h1> Choix du métier : </h1>
+  <button on:click={() => chooseJob("Caissier")}>🧾 Caissier</button>
+  <button on:click={() => chooseJob("Commercial")}>💼 Commercial</button>
+  <button on:click={() => chooseJob("Expert_Financier")}>📊 Expert Financier</button>
+  <button on:click={() => chooseJob("Jeff_Bezos")}>Jeff Bezos</button>
+{/if}
 
 
-<p>{message}</p>
+
+{#if isJobChoosen}
+  <h1>💰 Jeu éducatif : Intérêts Composés</h1>
+
+  <p>Mois : {month}</p>
+  <p>💵 Compte courant : {cash.toFixed(2)} €</p>
+  <p>🏦 Compte épargne : {savings.toFixed(2)} € - Intérêts prévisionnels : {(savings * interestRate).toFixed(2)}</p>
+  <p>🧾 Dépenses mensuelles : {annualExpenses} €</p>
+  <p>🛠️ Travail restant : {workLeft} / {initialWorkLeft}</p>
+  <p>🏠 Propriété : {ownedProperties.length > 0 ? 'Oui ✅' : 'Non ❌'}</p>
+
+  <div>
+    <button on:click={work} disabled={workLeft === 0}>👷 Travailler (+ {salaryPerWork.toFixed(2)} €)</button>
+    <button on:click={() => transfer(transferAmountSmall)}>📥 Transférer vers l’épargne ( { transferAmountSmall } €)</button>
+    <button on:click={nextYear}>⏭️ Nouveau mois </button>
+    
+    <h2>🏠 Biens disponibles :</h2>
+    <ul>
+      {#each availableProperties as property}
+        <li>
+          <strong>{property.name}</strong> – Prix : {property.price} € – Loyer mensuel : {property.rent} €
+          <button on:click={() => buy(property)}>Acheter</button>
+        </li>
+      {/each}
+    </ul>
+  </div>
+  <h2>📦 Biens possédés :</h2>
+  <ul>
+    {#each ownedProperties as property}
+      <li> <strong> {property.name} </strong>  ({property.rent} €/mois)</li>
+    {/each}
+  </ul>
+
+
+  <p>{message}</p>
+{/if}
+
