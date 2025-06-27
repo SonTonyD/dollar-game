@@ -160,12 +160,41 @@
 
     savingsProjection = result;
   }
+
+  // FREEDOM
+  let targetPassiveIncome = 2000;
+  let retirementYear = new Date().getFullYear() + 20;
+
+  let requiredMonthlySaving = 0;
+  let capitalTarget = 0;
+
+  function calculateFinancialFreedom() {
+    const ruleOfFourCapital = targetPassiveIncome * 12 / 0.04; // 4% rule
+    capitalTarget = ruleOfFourCapital;
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const monthsToInvest = (retirementYear - currentYear) * 12;
+
+    if (monthsToInvest <= 0) {
+      requiredMonthlySaving = 0;
+      return;
+    }
+
+    const netAnnualReturn = 0.08 * (1 - 0.30); // flat tax on 8%
+    const r = netAnnualReturn / 12; // taux mensuel
+
+    // Formule de la rente inversée : PMT = FV * r / ((1 + r)^n - 1)
+    requiredMonthlySaving = capitalTarget * r / (Math.pow(1 + r, monthsToInvest) - 1);
+  }
+
 </script>
 
 {#if currentPage === 'menu'}
   <h1>🏦 Menu principal</h1>
   <button on:click={() => currentPage = 'game'}>🎮 Lancer le jeu éducatif</button>
   <button on:click={() => currentPage = 'simulator'}>📈 Simulateur d’épargne</button>
+  <button on:click={() => currentPage = 'freedom'}>🗽 Liberté Financière</button>
 {/if}
 
 {#if currentPage === 'game'}
@@ -220,8 +249,7 @@
   {/if}
 {/if}
 
-<!-- SIMULATEUR -->
-
+<!-- SIMULATEUR EPARGNE-->
 {#if currentPage === 'simulator'}
   <h1>📈 Simulateur d’épargne</h1>
   <form on:submit|preventDefault={calculateSavings}>
@@ -274,6 +302,28 @@
   {/if}
 {/if}
 
+{#if currentPage === 'freedom'}
+  <h1>🗽 Objectif Liberté Financière</h1>
+  <form on:submit|preventDefault={calculateFinancialFreedom}>
+    <label>
+      💰 Revenu passif souhaité (€/mois)
+      <input type="number" bind:value={targetPassiveIncome} />
+    </label>
+    <label>
+      📅 Année de retraite souhaitée
+      <input type="number" min={new Date().getFullYear()} bind:value={retirementYear} />
+    </label>
+    <button type="submit">Calculer</button>
+    <button type="button" on:click={() => currentPage = 'menu'}>Retour au menu</button>
+  </form>
+
+  {#if requiredMonthlySaving > 0}
+    <p>🎯 Pour générer <strong>{targetPassiveIncome} €</strong>/mois à partir de <strong>{retirementYear}</strong>,</p>
+    <p>tu devras épargner <strong>{requiredMonthlySaving.toFixed(2)} €</strong>/mois à partir de maintenant.</p>
+    <p>Objectif : constituer un capital de <strong>{capitalTarget.toLocaleString()} €</strong>.</p>
+    <p>(Avec un rendement net de 5.6 %/an après flat tax)</p>
+  {/if}
+{/if}
 
 <!-- STYLE -->
 <style>
