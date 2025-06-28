@@ -1,5 +1,5 @@
 <script>
-  import Accordion from './Accordion.svelte';
+  import Game from './components/Game.svelte';
   let currentPage = "menu"; // 'menu' | 'game' | 'simulator'
 
 
@@ -273,78 +273,7 @@
 {/if}
 
 {#if currentPage === 'game'}
-  {#if !isJobChoosen}
-    <h1> Choix du métier : </h1>
-    <button on:click={() => chooseJob("Caissier")}>🧾 Caissier</button>
-    <button on:click={() => chooseJob("Commercial")}>💼 Commercial</button>
-    <button on:click={() => chooseJob("Expert_Financier")}>📊 Expert Financier</button>
-    <button on:click={() => chooseJob("Jeff_Bezos")}>Jeff Bezos</button>
-  {/if}
-
-
-
-  {#if isJobChoosen}
-    <h1>💰 Jeu éducatif : Intérêts Composés</h1>
-
-    <p>Mois : {month}</p>
-    <p>💵 Compte courant : {cash.toFixed(2)} €</p>
-    <p>🏦 Compte épargne : {savings.toFixed(2)} € - Intérêts prévisionnels : {(savings * interestRate).toFixed(2)}</p>
-    <p>🧾 Dépenses fixes : {annualExpenses} € de loyer et {calculateMonthlyExpenses()} € de mensualités</p>
-    <p>📥 Revenus locatifs : {ownedProperties.reduce((sum, p) => sum + p.rent, 0)} € / mois</p>
-    <p>🛠️ Travail restant : {workLeft} / {initialWorkLeft}</p>
-
-    <div>
-      <button on:click={work} disabled={workLeft === 0}>👷 Travailler (+ {salaryPerWork.toFixed(2)} €)</button>
-      <button on:click={() => transfer(transferAmountSmall)}>📥 Transférer vers l’épargne ( { transferAmountSmall } €)</button>
-      <button on:click={nextMonth}>⏭️ Nouveau mois </button>
-      
-      <Accordion title="💸 Emprunter de l'argent">
-        {#each loanTemplates as loan}
-          <button on:click={() => createLoan(loan.amount, loan.durationMonths, loan.annualRate)}>
-            {loan.name} – {loan.annualRate}% sur {loan.durationMonths / 12} ans
-          </button>
-        {/each}
-      </Accordion>
-
-      <Accordion title="💳 Emprunts en cours">
-        {#if loans.length > 0}
-          <ul>
-            {#each loans as loan}
-              <li>
-                <strong>{loan.amount.toLocaleString()} €</strong> – {loan.annualRate}% sur {loan.durationMonths} mois<br>
-                💸 Mensualité : {loan.monthlyPayment.toFixed(2)} € – Capital restant : {loan.remainingCapital.toFixed(2)} € – Mois restants : {loan.remainingMonths}
-              </li>
-            {/each}
-          </ul>
-        {:else}
-          <p>Aucun emprunt contracté.</p>
-        {/if}
-      </Accordion>
-
-      <Accordion title="🏠 Biens disponibles">
-        <ul>
-          {#each availableProperties as property}
-            <li>
-              <strong>{property.name}</strong> – Prix : {property.price} € – Loyer mensuel : {property.rent} €
-              <button on:click={() => buy(property)}>Acheter</button>
-            </li>
-          {/each}
-        </ul>
-      </Accordion>
-    </div>
-    <Accordion title="📦 Biens possédés">
-      {#if ownedProperties.length > 0}
-        <ul>
-          {#each ownedProperties as property}
-            <li><strong>{property.name}</strong> ({property.rent} €/mois)</li>
-          {/each}
-        </ul>
-      {:else}
-        <p>Aucune propriété achetée pour l’instant.</p>
-      {/if}
-    </Accordion>
-    <p>{message}</p>
-  {/if}
+  <Game></Game>
 {/if}
 
 <!-- SIMULATEUR EPARGNE-->
