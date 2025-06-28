@@ -14,3 +14,11 @@ git clone https://github.com/sontonyd/dollar-clicker.git
 cd dollar-clicker
 npm install
 ```
+
+## 📦 Déploiement
+
+```bash
+npm run build
+npm run deploy
+commit & push sur main
+```

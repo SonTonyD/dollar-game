@@ -145,7 +145,7 @@
     let month = startMonth;
     let year = startYear;
 
-    for (let i = 0; i < 120; i++) { // 10 ans
+    for (let i = 0; i < 120*5; i++) { // 50 ans
       value += monthlySaving;
       if (month === 12) {
         value += value * rate;
