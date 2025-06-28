@@ -116,10 +116,6 @@
     cursor: pointer;
   }
 
-  button[type="button"] {
-    background-color: #888;
-  }
-
   button:hover {
     opacity: 0.9;
   }

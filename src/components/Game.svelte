@@ -3,6 +3,17 @@
 
   let isJobChoosen = false;
 
+  let trainingTemplates = [
+    {
+      name: "Epargner mieux",
+      cost: 10000,
+    },
+    {
+      name: "Travailler mieux",
+      cost: 10000,
+    }
+  ];
+
   const loanTemplates = [
     {
       name: "Crédit conso (5 000 € sur 3 ans)",
@@ -59,7 +70,7 @@
 
   let salaryPerWork = 0;
 
-  const transferAmountSmall = 500;
+  let transferAmountSmall = 500;
   const annualExpenses = 700;
   const interestRate = 0.07;
   const workingDivider = 6;
@@ -200,6 +211,42 @@
     }, 0);
     return loanExpenses.toFixed(2);
   }
+
+  function personalTraining(trainingName, trainingCost) {
+    trainingCost = Number(trainingCost);
+    switch (trainingName) {
+      case "Epargner mieux":
+        if (trainingCost <= savings) {
+          savings = savings - trainingCost;
+          transferAmountSmall = transferAmountSmall * 1.5;
+
+          const trainingTemplate = trainingTemplates.find(t => t.name === trainingName);
+          trainingTemplate.cost = trainingTemplate.cost * 2;
+          trainingTemplates = trainingTemplates;
+          
+        } else {
+          alert("Pas assez d'argent !");
+        }
+        break;
+
+      case "Travailler mieux":
+        if (trainingCost <= savings) {
+          savings = savings - trainingCost;
+          salaryPerWork = salaryPerWork * 1.3;
+
+          const trainingTemplate = trainingTemplates.find(t => t.name === trainingName);
+          trainingTemplate.cost = trainingTemplate.cost * 5;
+          trainingTemplates = trainingTemplates;
+
+        } else {
+          alert("Pas assez d'argent !");
+        }
+        break;
+    
+      default:
+        break;
+    }
+  }
 </script>
 
 {#if !isJobChoosen}
@@ -207,7 +254,7 @@
   <button on:click={() => chooseJob("Caissier")}>🧾 Caissier</button>
   <button on:click={() => chooseJob("Commercial")}>💼 Commercial</button>
   <button on:click={() => chooseJob("Expert_Financier")}>📊 Expert Financier</button>
-  <button on:click={() => chooseJob("Jeff_Bezos")}>Jeff Bezos</button>
+  <button on:click={() => chooseJob("Jeff_Bezos")}>Jeff Bezos (profil de dev)</button>
 {/if}
 
 
@@ -224,9 +271,17 @@
 
   <div>
     <button on:click={work} disabled={workLeft === 0}>👷 Travailler (+ {salaryPerWork.toFixed(2)} €)</button>
-    <button on:click={() => transfer(transferAmountSmall)}>📥 Transférer vers l’épargne ( { transferAmountSmall } €)</button>
+    <button on:click={() => transfer(transferAmountSmall)}>📥 Transférer vers l’épargne ( { transferAmountSmall.toFixed(2) } €)</button>
     <button on:click={nextMonth}>⏭️ Nouveau mois </button>
     
+    <Accordion title="📖 Se former">
+      {#each trainingTemplates as training}
+        <button on:click={() => personalTraining(training.name, training.cost)}>
+          {training.name} – {training.cost } €
+        </button>
+      {/each}
+    </Accordion>
+
     <Accordion title="💸 Emprunter de l'argent">
       {#each loanTemplates as loan}
         <button on:click={() => createLoan(loan.amount, loan.durationMonths, loan.annualRate)}>
